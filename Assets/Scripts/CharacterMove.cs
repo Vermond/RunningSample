@@ -9,6 +9,7 @@ public class CharacterMove : MonoBehaviour {
     Vector3 jump;
     float jumpForce = 2.0f;
     float moveForce = 1.0f;
+    Animator animator;
 
     // Use this for initialization
     void Start ()
@@ -16,6 +17,8 @@ public class CharacterMove : MonoBehaviour {
         isGrounded = true;
         rb = GetComponent<Rigidbody2D>();
         jump = new Vector3(0.0f, 10.0f, 0.0f);
+
+        animator = GetComponent<Animator>();
     }
 	
 	// Update is called once per frame
@@ -30,29 +33,39 @@ public class CharacterMove : MonoBehaviour {
             //원래 방향
             transform.rotation = Quaternion.Euler(0, 0, 0);
             transform.Translate(x, 0, 0);
+
+            animator.SetBool("bIsRun", true);
         }
         else if (x < 0)
         {
             //반대 방향
             transform.rotation = Quaternion.Euler(0, 180, 0);
             transform.Translate(-x, 0, 0);
-        }
 
+            animator.SetBool("bIsRun", true);
+        }
+        else
+        {
+            animator.SetBool("bIsRun", false);
+        }
 
         //점프
         if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
         {
             rb.AddForce(jump * jumpForce);
         }
+        animator.SetFloat("ySpeed", rb.velocity.y);
     }
 
     private void OnCollisionStay2D(Collision2D collision)
     {
         isGrounded = true;
+        animator.SetBool("bJumping", false);
     }
 
     private void OnCollisionExit2D(Collision2D collision)
     {
         isGrounded = false;
+        animator.SetBool("bJumping", true);
     }
 }
